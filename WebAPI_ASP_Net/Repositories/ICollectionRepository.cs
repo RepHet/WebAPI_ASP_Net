@@ -8,5 +8,6 @@ namespace WebAPI_ASP_Net.Repositories
         void Add(T item); 
         bool Delete(T item); 
         bool Update(T oldItem, T newItem); 
+        bool DeleteAll();
     }
 }

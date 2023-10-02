@@ -6,11 +6,11 @@ namespace WebAPI_ASP_Net.Controllers
 {
     public class DictionaryController : ApiController
     {
-        private readonly ICollectionRepository<KeyValuePair<int, int>> _dictionaryRepository;
+        private readonly IDictionaryRepository<int, int> _dictionaryRepository;
 
-        public DictionaryController(ICollectionRepository<KeyValuePair<int, int>> dictionaryRepository)
+        public DictionaryController(IDictionaryRepository<int, int> dictionaryRepository)
         {
-            dictionaryRepository = dictionaryRepository;
+            _dictionaryRepository = dictionaryRepository;
         }
 
         [Route("api/dictionary")]

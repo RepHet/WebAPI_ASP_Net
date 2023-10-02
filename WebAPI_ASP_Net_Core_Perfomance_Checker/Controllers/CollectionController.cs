@@ -21,46 +21,7 @@ namespace WebAPI_ASP_Net_Core_Perfomance_Checker.Controllers
             var stopwatch = new Stopwatch();
             var results = new List<PerformanceResult>();
 
-            // Найкращий випадок (оптимальний) для List
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize; i++)
-            {
-                list.Add(i);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("List (Best Case)", stopwatch.ElapsedMilliseconds));
-            list.Clear();
-            stopwatch.Reset();
-
-            // Середній випадок (зазвичай оптимальний) для List
-            for (int i = 0; i < MaxSize; i++)
-            {
-                list.Add(i);
-            }
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize / 2; i++)
-            {
-                list.Remove(i);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("List (Average Case)", stopwatch.ElapsedMilliseconds));
-            list.Clear();
-            stopwatch.Reset();
-
-            // Найгірший випадок (найменший оптимальний) для List
-            for (int i = 0; i < MaxSize; i++)
-            {
-                list.Add(i);
-            }
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize; i++)
-            {
-                list.Insert(0, i);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("List (Worst Case)", stopwatch.ElapsedMilliseconds));
-            list.Clear();
-            stopwatch.Reset();
+            
 
             // Найкращий випадок (оптимальний) для Queue
             stopwatch.Start();

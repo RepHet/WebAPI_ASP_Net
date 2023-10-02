@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace WebAPI_ASP_Net.Utils
+namespace WebAPI_ASP_Net.Utils.Timer
 {
-    public class PerformanceTimer
+    public class PerformanceTimer : ITimer
     {
         private Stopwatch stopwatch = new Stopwatch();
 
@@ -17,9 +17,14 @@ namespace WebAPI_ASP_Net.Utils
             stopwatch.Stop();
         }
 
-        public TimeSpan ElapsedTime
+        public void Reset()
         {
-            get { return stopwatch.Elapsed; }
+            stopwatch.Reset();
+        }
+
+        public TimeSpan ElapsedTime()
+        {
+            return stopwatch.Elapsed;
         }
     }
 

@@ -1,13 +1,14 @@
 ﻿using System.Web.Http;
 using WebAPI_ASP_Net.Repositories;
+using WebAPI_ASP_Net.Repositories.Queue;
 
 namespace WebAPI_ASP_Net.Controllers
 {
     public class QueueController : ApiController
     {
-        private readonly ICollectionRepository<int> _queueRepository;
+        private readonly IQueueRepository<int> _queueRepository;
 
-        public QueueController(ICollectionRepository<int> queueRepository)
+        public QueueController(IQueueRepository<int> queueRepository)
         {
             _queueRepository = queueRepository;
         }

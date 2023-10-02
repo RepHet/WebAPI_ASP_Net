@@ -189,18 +189,27 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\Containers\DictionaryContainer.cs" />
-    <Compile Include="Repositories\Containers\ListContainer.cs" />
-    <Compile Include="Repositories\Containers\QueueContainer.cs" />
-    <Compile Include="Repositories\Containers\StackContainer.cs" />
-    <Compile Include="Repositories\DictionaryRepository.cs" />
+    <Compile Include="Models\Containers\Dictionary\DictionaryContainer.cs" />
+    <Compile Include="Models\Containers\Dictionary\IDictionaryContainer.cs" />
+    <Compile Include="Models\Containers\List\IListContainer.cs" />
+    <Compile Include="Models\Containers\List\ListContainer.cs" />
+    <Compile Include="Models\Containers\Queue\IQueueContainer.cs" />
+    <Compile Include="Models\Containers\Queue\QueueContainer.cs" />
+    <Compile Include="Models\Containers\Stack\IStackContainer.cs" />
+    <Compile Include="Models\Containers\Stack\StackContainer.cs" />
+    <Compile Include="Repositories\Dictionary\DictionaryRepository.cs" />
     <Compile Include="Repositories\ICollectionRepository.cs" />
-    <Compile Include="Repositories\ListRepository.cs" />
-    <Compile Include="Repositories\QueueRepository.cs" />
-    <Compile Include="Repositories\StackRepository.cs" />
+    <Compile Include="Repositories\Dictionary\IDictionaryRepository.cs" />
+    <Compile Include="Repositories\List\IListRepository.cs" />
+    <Compile Include="Repositories\List\ListRepository.cs" />
+    <Compile Include="Repositories\Queue\IQueueRepository.cs" />
+    <Compile Include="Repositories\Queue\QueueRepository.cs" />
+    <Compile Include="Repositories\Stack\IStackRepository.cs" />
+    <Compile Include="Repositories\Stack\StackRepository.cs" />
     <Compile Include="Utils\MemoryUsageAnalyzer.cs" />
     <Compile Include="Utils\PerformanceResult.cs" />
-    <Compile Include="Utils\RequestsPerSecondCounter.cs" />
+    <Compile Include="Utils\Timer\ITimer.cs" />
+    <Compile Include="Utils\Timer\PerformanceTimer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -270,7 +279,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Scripts\bootstrap.min.js.map" />

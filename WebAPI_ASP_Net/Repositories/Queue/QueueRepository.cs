@@ -1,38 +1,37 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using WebAPI_ASP_Net.Repositories.Containers;
+using WebAPI_ASP_Net.Repositories.Containers.Queue;
+using WebAPI_ASP_Net.Repositories.Queue;
 
 namespace WebAPI_ASP_Net.Repositories
 {
-    public class StackRepository : ICollectionRepository<int>
+    public class QueueRepository : IQueueRepository<int>
     {
-        private readonly Stack<int> stack;
-
-        public StackRepository(StackContainer container)
+        private readonly Queue<int> _queue;
+        public QueueRepository(IQueueContainer<int> container)
         {
-            stack = container.Stack;
+            _queue = container.Queue;
         }
         public IEnumerable<int> GetAll()
         {
-            return stack;
+            return _queue;
         }
 
         public void Add(int item)
         {
-            stack.Push(item);
+            _queue.Enqueue(item);
         }
 
         public bool Delete(int item)
         {
-            var tempList = stack.ToList();
+            var tempList = _queue.ToList();
             bool success = tempList.Remove(item);
             if (success)
             {
-                stack.Clear();
+                _queue.Clear();
                 foreach (var i in tempList)
                 {
-                    stack.Push(i);
+                    _queue.Enqueue(i);
                 }
             }
             return success;
@@ -40,24 +39,29 @@ namespace WebAPI_ASP_Net.Repositories
 
         public int Peek()
         {
-            return stack.Peek();
+            return _queue.Peek();
         }
 
         public bool Update(int oldItem, int newItem)
         {
-            var tempList = stack.ToList();
+            var tempList = _queue.ToList();
             int index = tempList.IndexOf(oldItem);
             if (index != -1)
             {
                 tempList[index] = newItem;
-                stack.Clear();
+                _queue.Clear();
                 foreach (var i in tempList)
                 {
-                    stack.Push(i);
+                    _queue.Enqueue(i);
                 }
                 return true;
             }
             return false;
+        }
+
+        public bool DeleteAll()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

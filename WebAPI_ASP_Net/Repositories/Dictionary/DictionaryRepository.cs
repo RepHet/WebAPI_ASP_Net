@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using WebAPI_ASP_Net.Repositories.Containers;
+using WebAPI_ASP_Net.Repositories.Containers.Dictionary;
 
 namespace WebAPI_ASP_Net.Repositories
 {
-    public class DictionaryRepository : ICollectionRepository<KeyValuePair<int, int>>
+    public class DictionaryRepository : IDictionaryRepository<int, int>
     {
         private readonly Dictionary<int, int> dictionary;
 
-        public DictionaryRepository(DictionaryContainer container)
+        public DictionaryRepository(IDictionaryContainer<int, int> container)
         {
             dictionary = container.Dictionary;
         }
@@ -34,6 +35,11 @@ namespace WebAPI_ASP_Net.Repositories
                 return true;
             }
             return false;
+        }
+
+        public bool DeleteAll()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

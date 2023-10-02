@@ -1,15 +1,16 @@
 ﻿using System.Web.Http;
 using WebAPI_ASP_Net.Repositories;
+using WebAPI_ASP_Net.Repositories.Stack;
 
 namespace WebAPI_ASP_Net.Controllers
 {
     public class StackController : ApiController
     {
-        private readonly ICollectionRepository<int> _stackRepository;
+        private readonly IStackRepository<int> _stackRepository;
 
-        public StackController(ICollectionRepository<int> stackRepository)
+        public StackController(IStackRepository<int> stackRepository)
         {
-            stackRepository = stackRepository;
+            _stackRepository = stackRepository;
         }
 
         [Route("api/stack")]
