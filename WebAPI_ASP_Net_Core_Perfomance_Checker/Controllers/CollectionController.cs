@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Diagnostics;
-using WebAPI_ASP_NET_Core.Models;
+using WebAPI_ASP_NET_Core_Perfomance_Checker.Models;
 
-namespace WebAPI_ASP_Net.Controllers
+namespace WebAPI_ASP_Net_Core_Perfomance_Checker.Controllers
 {
+    //[ApiController]
+    //[Route("[controller]")]
     public class CollectionController : ControllerBase
     {
         private List<int> list = new List<int>();
         private Queue<int> queue = new Queue<int>();
         private Stack<int> stack = new Stack<int>();
-        private HashSet<int> hashSet = new HashSet<int>();
-        private SortedSet<int> sortedSet = new SortedSet<int>();
         private Dictionary<int, string> dictionary = new Dictionary<int, string>();
-        private SortedList<int, string> sortedList = new SortedList<int, string>();
 
         private const int MaxSize = 1000000;
 
@@ -145,88 +144,6 @@ namespace WebAPI_ASP_Net.Controllers
             stack.Clear();
             stopwatch.Reset();
 
-            // Найкращий випадок (оптимальний) для HashSet
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize; i++)
-            {
-                hashSet.Add(i);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("HashSet (Best Case)", stopwatch.ElapsedMilliseconds));
-            hashSet.Clear();
-            stopwatch.Reset();
-
-            // Середній випадок (зазвичай оптимальний) для HashSet
-            for (int i = 0; i < MaxSize; i++)
-            {
-                hashSet.Add(i);
-            }
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize / 2; i++)
-            {
-                hashSet.Remove(i);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("HashSet (Average Case)", stopwatch.ElapsedMilliseconds));
-            hashSet.Clear();
-            stopwatch.Reset();
-
-            // Найгірший випадок (найменший оптимальний) для HashSet
-            for (int i = 0; i < MaxSize; i++)
-            {
-                hashSet.Add(i);
-            }
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize / 2; i++)
-            {
-                hashSet.Remove(i + MaxSize);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("HashSet (Worst Case)", stopwatch.ElapsedMilliseconds));
-            hashSet.Clear();
-            stopwatch.Reset();
-
-            // Найкращий випадок (оптимальний) для SortedSet
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize; i++)
-            {
-                sortedSet.Add(i);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("SortedSet (Best Case)", stopwatch.ElapsedMilliseconds));
-            sortedSet.Clear();
-            stopwatch.Reset();
-
-            // Середній випадок (зазвичай оптимальний) для SortedSet
-            for (int i = 0; i < MaxSize; i++)
-            {
-                sortedSet.Add(i);
-            }
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize / 2; i++)
-            {
-                sortedSet.Remove(i);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("SortedSet (Average Case)", stopwatch.ElapsedMilliseconds));
-            sortedSet.Clear();
-            stopwatch.Reset();
-
-            // Найгірший випадок (найменший оптимальний) для SortedSet
-            for (int i = 0; i < MaxSize; i++)
-            {
-                sortedSet.Add(i);
-            }
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize / 2; i++)
-            {
-                sortedSet.Remove(i + MaxSize);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("SortedSet (Worst Case)", stopwatch.ElapsedMilliseconds));
-            sortedSet.Clear();
-            stopwatch.Reset();
-
             // Найкращий випадок (оптимальний) для Dictionary
             stopwatch.Start();
             for (int i = 0; i < MaxSize; i++)
@@ -266,47 +183,6 @@ namespace WebAPI_ASP_Net.Controllers
             stopwatch.Stop();
             results.Add(new PerformanceResult("Dictionary (Worst Case)", stopwatch.ElapsedMilliseconds));
             dictionary.Clear();
-            stopwatch.Reset();
-
-            // Найкращий випадок (оптимальний) для SortedList
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize; i++)
-            {
-                sortedList[i] = i.ToString();
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("SortedList (Best Case)", stopwatch.ElapsedMilliseconds));
-            sortedList.Clear();
-            stopwatch.Reset();
-
-            // Середній випадок (зазвичай оптимальний) для SortedList
-            for (int i = 0; i < MaxSize; i++)
-            {
-                sortedList[i] = i.ToString();
-            }
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize / 2; i++)
-            {
-                sortedList.Remove(i);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("SortedList (Average Case)", stopwatch.ElapsedMilliseconds));
-            sortedList.Clear();
-            stopwatch.Reset();
-
-            // Найгірший випадок (найменший оптимальний) для SortedList
-            for (int i = 0; i < MaxSize; i++)
-            {
-                sortedList[i] = i.ToString();
-            }
-            stopwatch.Start();
-            for (int i = 0; i < MaxSize / 2; i++)
-            {
-                sortedList.Remove(i + MaxSize);
-            }
-            stopwatch.Stop();
-            results.Add(new PerformanceResult("SortedList (Worst Case)", stopwatch.ElapsedMilliseconds));
-            sortedList.Clear();
             stopwatch.Reset();
 
             return Ok(results);

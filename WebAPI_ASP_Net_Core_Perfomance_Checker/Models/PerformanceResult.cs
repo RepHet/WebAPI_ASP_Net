@@ -1,4 +1,4 @@
-﻿namespace WebAPI_ASP_NET_Core.Models
+﻿namespace WebAPI_ASP_NET_Core_Perfomance_Checker.Models
 {
     public class PerformanceResult
     {

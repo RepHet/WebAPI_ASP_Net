@@ -5,7 +5,9 @@ VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI_ASP_Net", "WebAPI_ASP_Net\WebAPI_ASP_Net.csproj", "{9BF76A28-36A2-4E6C-B9C7-29DE8819B026}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI_ASP_NET_Core", "WebAPI_ASP_NET_Core\WebAPI_ASP_NET_Core.csproj", "{87F4D421-DD38-4390-A4A5-35CF857166F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI_ASP_NET_Core", "WebAPI_ASP_NET_Core\WebAPI_ASP_NET_Core.csproj", "{87F4D421-DD38-4390-A4A5-35CF857166F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI_ASP_Net_Core_Perfomance_Checker", "WebAPI_ASP_Net_Core_Perfomance_Checker\WebAPI_ASP_Net_Core_Perfomance_Checker.csproj", "{7F9577EC-FDA1-4AEB-9CFB-FB987DAF82C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{87F4D421-DD38-4390-A4A5-35CF857166F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87F4D421-DD38-4390-A4A5-35CF857166F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87F4D421-DD38-4390-A4A5-35CF857166F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F9577EC-FDA1-4AEB-9CFB-FB987DAF82C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F9577EC-FDA1-4AEB-9CFB-FB987DAF82C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F9577EC-FDA1-4AEB-9CFB-FB987DAF82C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F9577EC-FDA1-4AEB-9CFB-FB987DAF82C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
