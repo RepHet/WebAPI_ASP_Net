@@ -206,7 +206,8 @@
     <Compile Include="Repositories\Queue\QueueRepository.cs" />
     <Compile Include="Repositories\Stack\IStackRepository.cs" />
     <Compile Include="Repositories\Stack\StackRepository.cs" />
-    <Compile Include="Utils\MemoryUsageAnalyzer.cs" />
+    <Compile Include="Utils\MemoryUsage\MemoryMetricsModel.cs" />
+    <Compile Include="Utils\MemoryUsage\MemoryInfoProvider.cs" />
     <Compile Include="Utils\PerformanceResult.cs" />
     <Compile Include="Utils\Timer\ITimer.cs" />
     <Compile Include="Utils\Timer\PerformanceTimer.cs" />

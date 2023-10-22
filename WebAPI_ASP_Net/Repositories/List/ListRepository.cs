@@ -4,9 +4,11 @@ using WebAPI_ASP_Net.Repositories.List;
 
 namespace WebAPI_ASP_Net.Repositories
 {
-    public class ListRepository : IListRepository<int>
+    public class ListRepository : IListRepository<int>, IListContainer<int>
     {
         private readonly IListContainer<int> _listContainer;
+
+        public List<int> List => _listContainer.List;
 
         public ListRepository(IListContainer<int> container)
         {
@@ -47,6 +49,11 @@ namespace WebAPI_ASP_Net.Repositories
                 return false; 
             }
             return true;
+        }
+
+        public int GetLength()
+        {
+            return _listContainer.List.Count;
         }
     }
 }

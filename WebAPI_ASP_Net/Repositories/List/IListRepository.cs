@@ -2,5 +2,6 @@
 {
     public interface IListRepository<T> : ICollectionRepository<T>
     {
+        int GetLength();
     }
 }

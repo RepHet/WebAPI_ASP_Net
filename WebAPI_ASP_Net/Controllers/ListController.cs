@@ -1,6 +1,10 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Web.Http;
+using WebAPI_ASP_Net.Repositories.Containers.List;
 using WebAPI_ASP_Net.Repositories.List;
 using WebAPI_ASP_Net.Utils;
+using WebAPI_ASP_Net.Utils.MemoryUsage;
 using WebAPI_ASP_Net.Utils.Timer;
 
 namespace WebAPI_ASP_Net.Controllers
@@ -60,69 +64,94 @@ namespace WebAPI_ASP_Net.Controllers
                 return NotFound();
             }
         }
-        [Route("api/list/result/best")]
+        [Route("api/list/add/best")]
         [HttpGet]
-        public IHttpActionResult GetBestResult(int maxSize)
+        public IHttpActionResult PostBest(int maxSize = 268435456/2)
         {
+            IListContainer<int> listContainer = new ListContainer<int>();
+
+            var memoryBeforeTest = new MemoryMetricsModel
+            {
+                GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
+            };
+
             _timer.Start();
             for (int i = 0; i < maxSize; i++)
             {
-                _listRepository.Add(i);
+                try {
+                    listContainer.List.Add(i);
+                } 
+                catch
+                {
+                    break;
+                }
             }
             _timer.Stop();
 
-            MemoryUsageAnalyzer memory = new MemoryUsageAnalyzer();
+            var memoryAfterTest = new MemoryMetricsModel
+            {
+                GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
+            };
+
+            Dictionary<string, MemoryMetricsModel> memoriesUsage = new Dictionary<string, MemoryMetricsModel>
+            {
+                { "Before test", memoryBeforeTest },
+                { "After test", memoryAfterTest }
+            };
 
             PerformanceResult performanceResult = new PerformanceResult
             {
-                TestName = "List (Best)",
+                TestName = "List add (best)",
                 ExecutionTimeMs = _timer.ElapsedTime().Milliseconds,
-                MemoryUsageBytes = memory.GetMemoryUsage(),
+                MemoriesUsage = memoriesUsage,
             };
-            _listRepository.DeleteAll();
+
             return Ok(performanceResult);
         }
+        [Route("api/list/add/worst")]
+        [HttpGet]
+        public IHttpActionResult PostWorst(int maxSize = 268435456/2)
+        {
+            IListContainer<int> listContainer = new ListContainer<int>();
+            var memoryBeforeTest = new MemoryMetricsModel
+            {
+                GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
+            };
 
-        //[Route("api/list")]
-        //[HttpGet]
-        //public IHttpActionResult GetWorstResult(int item)
-        //{
-        //    for (int i = 0; i < MaxSize; i++)
-        //    {
-        //        list.Add(i);
-        //    }
-        //    stopwatch.Start();
-        //    for (int i = 0; i < MaxSize; i++)
-        //    {
-        //        list.Insert(0, i);
-        //    }
-        //    stopwatch.Stop();
-        //    results.Add(new PerformanceResult("List (Worst Case)", stopwatch.ElapsedMilliseconds));
-        //    list.Clear();
-        //    stopwatch.Reset();
-        //}
+            _timer.Start();
 
+            listContainer.List.Add(0);
+            for (int i = 1; i < maxSize; i++)
+            {
+                try {
+                    listContainer.List.Insert(i - 1, i);
+                } 
+                catch
+                {
+                    break;
+                }
+            }
+            _timer.Stop();
 
+            var memoryAfterTest = new MemoryMetricsModel
+            {
+                GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
+            };
 
-        //[Route("api/list")]
-        //[HttpGet]
-        //public IHttpActionResult GetOptimalResult(int item)
-        //{
+            Dictionary<string, MemoryMetricsModel> memoriesUsage = new Dictionary<string, MemoryMetricsModel>
+            {
+                { "Before test", memoryBeforeTest },
+                { "After test", memoryAfterTest }
+            };
 
-        //    // Середній випадок (зазвичай оптимальний) для List
-        //    for (int i = 0; i < MaxSize; i++)
-        //    {
-        //        list.Add(i);
-        //    }
-        //    stopwatch.Start();
-        //    for (int i = 0; i < MaxSize / 2; i++)
-        //    {
-        //        list.Remove(i);
-        //    }
-        //    stopwatch.Stop();
-        //    results.Add(new PerformanceResult("List (Average Case)", stopwatch.ElapsedMilliseconds));
-        //    list.Clear();
-        //    stopwatch.Reset();
-        //}
+            PerformanceResult performanceResult = new PerformanceResult
+            {
+                TestName = "List add (worst)",
+                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds,
+                MemoriesUsage = memoriesUsage,
+            };
+
+            return Ok(performanceResult);
+        }
     }
 }
