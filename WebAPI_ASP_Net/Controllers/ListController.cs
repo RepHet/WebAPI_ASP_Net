@@ -5,12 +5,14 @@ using WebAPI_ASP_Net.Repositories.Containers.List;
 using WebAPI_ASP_Net.Repositories.List;
 using WebAPI_ASP_Net.Utils;
 using WebAPI_ASP_Net.Utils.MemoryUsage;
+using WebAPI_ASP_Net.Utils.MetricModels;
 using WebAPI_ASP_Net.Utils.Timer;
 
 namespace WebAPI_ASP_Net.Controllers
 {
     public class ListController : ApiController
     {
+        const int maxElementSize = 268435456 / 2;
         private readonly IListRepository<int> _listRepository;
         private readonly ITimer _timer;
 
@@ -66,11 +68,11 @@ namespace WebAPI_ASP_Net.Controllers
         }
         [Route("api/list/add/best")]
         [HttpGet]
-        public IHttpActionResult PostBest(int maxSize = 268435456/2)
+        public IHttpActionResult GetBest(int maxSize = maxElementSize)
         {
             IListContainer<int> listContainer = new ListContainer<int>();
 
-            var memoryBeforeTest = new MemoryMetricsModel
+            var heapMetricModelBeforeTest = new HeapInfoMetricModel
             {
                 GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
             };
@@ -88,32 +90,52 @@ namespace WebAPI_ASP_Net.Controllers
             }
             _timer.Stop();
 
-            var memoryAfterTest = new MemoryMetricsModel
+            var heapMetricModelAfterTest = new HeapInfoMetricModel
             {
                 GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
             };
 
-            Dictionary<string, MemoryMetricsModel> memoriesUsage = new Dictionary<string, MemoryMetricsModel>
+            var executionTimeMetricModel = new ExecutionTimeMetricModel
             {
-                { "Before test", memoryBeforeTest },
-                { "After test", memoryAfterTest }
+                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
             };
 
-            PerformanceResult performanceResult = new PerformanceResult
+            IDictionary<string, IEnumerable<IMetricModel>> metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+            {
+                {
+                    "Before test",
+                    new List<IMetricModel> {
+                        heapMetricModelBeforeTest
+                    }
+                },
+                {
+                    "After test",
+                    new List<IMetricModel> {
+                        heapMetricModelAfterTest
+                    }
+                },
+                {
+                    "Test execution time",
+                    new List<IMetricModel> {
+                        executionTimeMetricModel
+                    }
+                },
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
             {
                 TestName = "List add (best)",
-                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds,
-                MemoriesUsage = memoriesUsage,
+                Metrics = metrics
             };
 
             return Ok(performanceResult);
         }
         [Route("api/list/add/worst")]
         [HttpGet]
-        public IHttpActionResult PostWorst(int maxSize = 268435456/2)
+        public IHttpActionResult GetWorst(int maxSize = maxElementSize)
         {
             IListContainer<int> listContainer = new ListContainer<int>();
-            var memoryBeforeTest = new MemoryMetricsModel
+            var heapMetricModelBeforeTest = new HeapInfoMetricModel
             {
                 GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
             };
@@ -133,22 +155,42 @@ namespace WebAPI_ASP_Net.Controllers
             }
             _timer.Stop();
 
-            var memoryAfterTest = new MemoryMetricsModel
+            var heapMetricModelAfterTest = new HeapInfoMetricModel
             {
                 GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
             };
 
-            Dictionary<string, MemoryMetricsModel> memoriesUsage = new Dictionary<string, MemoryMetricsModel>
+            var executionTimeMetricModel = new ExecutionTimeMetricModel
             {
-                { "Before test", memoryBeforeTest },
-                { "After test", memoryAfterTest }
+                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
             };
 
-            PerformanceResult performanceResult = new PerformanceResult
+            IDictionary<string, IEnumerable<IMetricModel>> metrics = new Dictionary<string, IEnumerable<IMetricModel>>
             {
-                TestName = "List add (worst)",
-                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds,
-                MemoriesUsage = memoriesUsage,
+                {
+                    "Before test",
+                    new List<IMetricModel> {
+                        heapMetricModelBeforeTest
+                    }
+                },
+                {
+                    "After test",
+                    new List<IMetricModel> {
+                        heapMetricModelAfterTest
+                    }
+                },
+                {
+                    "Test execution time",
+                    new List<IMetricModel> {
+                        executionTimeMetricModel
+                    }
+                },
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "List add (best)",
+                Metrics = metrics
             };
 
             return Ok(performanceResult);

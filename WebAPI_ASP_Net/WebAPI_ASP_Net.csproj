@@ -206,11 +206,13 @@
     <Compile Include="Repositories\Queue\QueueRepository.cs" />
     <Compile Include="Repositories\Stack\IStackRepository.cs" />
     <Compile Include="Repositories\Stack\StackRepository.cs" />
-    <Compile Include="Utils\MemoryUsage\MemoryMetricsModel.cs" />
-    <Compile Include="Utils\MemoryUsage\MemoryInfoProvider.cs" />
-    <Compile Include="Utils\PerformanceResult.cs" />
-    <Compile Include="Utils\Timer\ITimer.cs" />
-    <Compile Include="Utils\Timer\PerformanceTimer.cs" />
+    <Compile Include="Utils\Models\MetricModels\HeapInfoMetricModel.cs" />
+    <Compile Include="Utils\Services\MemoryInfo\MemoryInfoProvider.cs" />
+    <Compile Include="Utils\Models\MetricModels\ExecutionTimeMetricModel.cs" />
+    <Compile Include="Utils\Models\MetricModels\IMetricModel.cs" />
+    <Compile Include="Utils\Models\PerformanceTestModel.cs" />
+    <Compile Include="Utils\Services\Timer\ITimer.cs" />
+    <Compile Include="Utils\Services\Timer\PerformanceTimer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
