@@ -30,10 +30,9 @@ namespace WebAPI_ASP_Net.Repositories
             return _listContainer.List.Remove(item);
         }
 
-        public bool Update(int oldItem, int newItem)
+        public bool Update(int index, int newItem)
         {
-            int index = _listContainer.List.IndexOf(oldItem);
-            if (index != -1)
+            if (index > -1 && index < _listContainer.List.Count)
             {
                 _listContainer.List[index] = newItem;
                 return true;

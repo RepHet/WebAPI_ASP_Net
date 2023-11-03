@@ -1,37 +1,38 @@
 ﻿using System.Collections.Generic;
-using WebAPI_ASP_Net.Repositories.Containers;
 using WebAPI_ASP_Net.Repositories.Containers.Dictionary;
 
 namespace WebAPI_ASP_Net.Repositories
 {
     public class DictionaryRepository : IDictionaryRepository<int, int>
     {
-        private readonly Dictionary<int, int> dictionary;
+        private readonly IDictionaryContainer<int, int> _dictionaryContainer;
+
+        public Dictionary<int, int> Dictionary => _dictionaryContainer.Dictionary;
 
         public DictionaryRepository(IDictionaryContainer<int, int> container)
         {
-            dictionary = container.Dictionary;
+            _dictionaryContainer = container;
         }
         public IEnumerable<KeyValuePair<int, int>> GetAll()
         {
-            return dictionary;
+            return _dictionaryContainer.Dictionary;
         }
 
         public void Add(KeyValuePair<int, int> item)
         {
-            dictionary.Add(item.Key, item.Value);
+            _dictionaryContainer.Dictionary.Add(item.Key, item.Value);
         }
 
         public bool Delete(KeyValuePair<int, int> item)
         {
-            return dictionary.Remove(item.Key);
+            return _dictionaryContainer.Dictionary.Remove(item.Key);
         }
 
-        public bool Update(KeyValuePair<int, int> oldItem, KeyValuePair<int, int> newItem)
+        public bool Update(int key, KeyValuePair<int, int> newItem)
         {
-            if (dictionary.TryGetValue(oldItem.Key, out int value) && value == oldItem.Value)
+            if (_dictionaryContainer.Dictionary.TryGetValue(key, out int value))
             {
-                dictionary[oldItem.Key] = newItem.Value;
+                _dictionaryContainer.Dictionary[key] = newItem.Value;
                 return true;
             }
             return false;
@@ -39,7 +40,15 @@ namespace WebAPI_ASP_Net.Repositories
 
         public bool DeleteAll()
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                _dictionaryContainer.Dictionary.Clear();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

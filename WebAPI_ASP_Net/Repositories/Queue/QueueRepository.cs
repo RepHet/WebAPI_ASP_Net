@@ -7,31 +7,33 @@ namespace WebAPI_ASP_Net.Repositories
 {
     public class QueueRepository : IQueueRepository<int>
     {
-        private readonly Queue<int> _queue;
+        private readonly IQueueContainer<int> _queueContainer;
+        public Queue<int> Queue => _queueContainer.Queue;
+
         public QueueRepository(IQueueContainer<int> container)
         {
-            _queue = container.Queue;
+            _queueContainer = container;
         }
         public IEnumerable<int> GetAll()
         {
-            return _queue;
+            return _queueContainer.Queue;
         }
 
         public void Add(int item)
         {
-            _queue.Enqueue(item);
+            _queueContainer.Queue.Enqueue(item);
         }
 
         public bool Delete(int item)
         {
-            var tempList = _queue.ToList();
+            var tempList = _queueContainer.Queue.ToList();
             bool success = tempList.Remove(item);
             if (success)
             {
-                _queue.Clear();
+                _queueContainer.Queue.Clear();
                 foreach (var i in tempList)
                 {
-                    _queue.Enqueue(i);
+                    _queueContainer.Queue.Enqueue(i);
                 }
             }
             return success;
@@ -39,20 +41,19 @@ namespace WebAPI_ASP_Net.Repositories
 
         public int Peek()
         {
-            return _queue.Peek();
+            return _queueContainer.Queue.Peek();
         }
 
-        public bool Update(int oldItem, int newItem)
+        public bool Update(int index, int newItem)
         {
-            var tempList = _queue.ToList();
-            int index = tempList.IndexOf(oldItem);
-            if (index != -1)
+            var tempList = _queueContainer.Queue.ToList();
+            if (index > -1 && index < tempList.Count)
             {
                 tempList[index] = newItem;
-                _queue.Clear();
+                _queueContainer.Queue.Clear();
                 foreach (var i in tempList)
                 {
-                    _queue.Enqueue(i);
+                    _queueContainer.Queue.Enqueue(i);
                 }
                 return true;
             }
@@ -61,7 +62,15 @@ namespace WebAPI_ASP_Net.Repositories
 
         public bool DeleteAll()
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                _queueContainer.Queue.Clear();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
