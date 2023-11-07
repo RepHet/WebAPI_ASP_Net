@@ -6,6 +6,7 @@ using WebAPI_ASP_Net.Repositories.List;
 using WebAPI_ASP_Net.Utils;
 using WebAPI_ASP_Net.Utils.MemoryUsage;
 using WebAPI_ASP_Net.Utils.MetricModels;
+using WebAPI_ASP_Net.Utils.Models.MetricModels;
 using WebAPI_ASP_Net.Utils.Timer;
 
 namespace WebAPI_ASP_Net.Controllers
@@ -70,11 +71,16 @@ namespace WebAPI_ASP_Net.Controllers
         [HttpGet]
         public IHttpActionResult GetBest(int maxSize = maxElementSize)
         {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             IListContainer<int> listContainer = new ListContainer<int>();
 
-            var heapMetricModelBeforeTest = new HeapInfoMetricModel
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
             {
-                GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
+                Title = "Process before Test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
             };
 
             _timer.Start();
@@ -89,43 +95,49 @@ namespace WebAPI_ASP_Net.Controllers
                 }
             }
             _timer.Stop();
+            GC.Collect();
 
-            var heapMetricModelAfterTest = new HeapInfoMetricModel
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
             {
-                GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
             };
 
-            var executionTimeMetricModel = new ExecutionTimeMetricModel
+            var executionTime = new ExecutionTimeMetricModel
             {
                 ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
             };
 
-            IDictionary<string, IEnumerable<IMetricModel>> metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+            var GCMemorySize = new MemoryInfoMetricModel
             {
-                {
-                    "Before test",
-                    new List<IMetricModel> {
-                        heapMetricModelBeforeTest
-                    }
-                },
-                {
-                    "After test",
-                    new List<IMetricModel> {
-                        heapMetricModelAfterTest
-                    }
-                },
-                {
-                    "Test execution time",
-                    new List<IMetricModel> {
-                        executionTimeMetricModel
-                    }
-                },
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
             };
 
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
                 TestName = "List add (best)",
-                Metrics = metrics
+                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel> {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
             };
 
             return Ok(performanceResult);
@@ -134,14 +146,18 @@ namespace WebAPI_ASP_Net.Controllers
         [HttpGet]
         public IHttpActionResult GetWorst(int maxSize = maxElementSize)
         {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             IListContainer<int> listContainer = new ListContainer<int>();
-            var heapMetricModelBeforeTest = new HeapInfoMetricModel
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
             {
-                GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
+                Title = "Process before Test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
             };
 
             _timer.Start();
-
             listContainer.List.Add(0);
             for (int i = 1; i < maxSize; i++)
             {
@@ -154,43 +170,48 @@ namespace WebAPI_ASP_Net.Controllers
                 }
             }
             _timer.Stop();
+            GC.Collect();
 
-            var heapMetricModelAfterTest = new HeapInfoMetricModel
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
             {
-                GCHeapSize = MemoryInfoProvider.GetGCHeapSize(),
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
             };
 
-            var executionTimeMetricModel = new ExecutionTimeMetricModel
+            var executionTime = new ExecutionTimeMetricModel
             {
                 ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
             };
 
-            IDictionary<string, IEnumerable<IMetricModel>> metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+            var GCMemorySize = new MemoryInfoMetricModel
             {
-                {
-                    "Before test",
-                    new List<IMetricModel> {
-                        heapMetricModelBeforeTest
-                    }
-                },
-                {
-                    "After test",
-                    new List<IMetricModel> {
-                        heapMetricModelAfterTest
-                    }
-                },
-                {
-                    "Test execution time",
-                    new List<IMetricModel> {
-                        executionTimeMetricModel
-                    }
-                },
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
             };
 
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
-                TestName = "List add (best)",
-                Metrics = metrics
+                TestName = "List add (worst)",
+                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel> {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
             };
 
             return Ok(performanceResult);

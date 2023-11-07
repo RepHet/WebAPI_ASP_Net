@@ -28,11 +28,11 @@ namespace WebAPI_ASP_Net.Repositories
             return _dictionaryContainer.Dictionary.Remove(item.Key);
         }
 
-        public bool Update(int key, KeyValuePair<int, int> newItem)
+        public bool Update(int key, int newItem)
         {
             if (_dictionaryContainer.Dictionary.TryGetValue(key, out int value))
             {
-                _dictionaryContainer.Dictionary[key] = newItem.Value;
+                _dictionaryContainer.Dictionary[key] = newItem;
                 return true;
             }
             return false;
@@ -49,6 +49,16 @@ namespace WebAPI_ASP_Net.Repositories
                 return false;
             }
             return true;
+        }
+
+        public bool Update(int key, KeyValuePair<int, int> newItem)
+        {
+            if (_dictionaryContainer.Dictionary.TryGetValue(key, out int value))
+            {
+                _dictionaryContainer.Dictionary[key] = newItem.Value;
+                return true;
+            }
+            return false;
         }
     }
 }

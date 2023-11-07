@@ -206,7 +206,8 @@
     <Compile Include="Repositories\Queue\QueueRepository.cs" />
     <Compile Include="Repositories\Stack\IStackRepository.cs" />
     <Compile Include="Repositories\Stack\StackRepository.cs" />
-    <Compile Include="Utils\Models\MetricModels\HeapInfoMetricModel.cs" />
+    <Compile Include="Utils\Models\MetricModels\GlobalEnums.cs" />
+    <Compile Include="Utils\Models\MetricModels\MemoryInfoMetricModel.cs" />
     <Compile Include="Utils\Services\MemoryInfo\MemoryInfoProvider.cs" />
     <Compile Include="Utils\Models\MetricModels\ExecutionTimeMetricModel.cs" />
     <Compile Include="Utils\Models\MetricModels\IMetricModel.cs" />
