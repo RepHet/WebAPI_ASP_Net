@@ -8,5 +8,6 @@ namespace WebAPI_ASP_Net.Repositories.Queue
 {
     public interface IQueueRepository<T> : ICollectionRepository<T>
     {
+        int Peek();
     }
 }

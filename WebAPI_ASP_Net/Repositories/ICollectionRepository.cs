@@ -7,7 +7,7 @@ namespace WebAPI_ASP_Net.Repositories
         IEnumerable<T> GetAll();
         void Add(T item); 
         bool Delete(T item); 
-        bool Update(T oldItem, T newItem); 
+        bool Update(int index, T newItem); 
         bool DeleteAll();
     }
 }
