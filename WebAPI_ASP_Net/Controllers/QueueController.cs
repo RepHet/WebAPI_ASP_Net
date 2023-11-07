@@ -1,15 +1,29 @@
-﻿using System.Web.Http;
+﻿using System.Collections.Generic;
+using System;
+using System.Web.Http;
+using WebAPI_ASP_Net.Repositories.Containers.List;
 using WebAPI_ASP_Net.Repositories.Queue;
+using WebAPI_ASP_Net.Utils.MemoryUsage;
+using WebAPI_ASP_Net.Utils.MetricModels;
+using WebAPI_ASP_Net.Utils.Models.MetricModels;
+using WebAPI_ASP_Net.Utils;
+using WebAPI_ASP_Net.Utils.Timer;
+using WebAPI_ASP_Net.Repositories.Containers.Queue;
+using System.Reflection;
+using System.Linq;
 
 namespace WebAPI_ASP_Net.Controllers
 {
     public class QueueController : ApiController
     {
+        const int maxElementSize = 268435456 / 2;
         private readonly IQueueRepository<int> _queueRepository;
+        private readonly ITimer _timer;
 
-        public QueueController(IQueueRepository<int> queueRepository)
+        public QueueController(IQueueRepository<int> queueRepository, ITimer timer)
         {
             _queueRepository = queueRepository;
+            _timer = timer;
         }
 
         [Route("api/queue")]
@@ -55,6 +69,164 @@ namespace WebAPI_ASP_Net.Controllers
             {
                 return NotFound();
             }
+        }
+
+        [Route("api/queue/add/best")]
+        [HttpGet]
+        public IHttpActionResult GetBest(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IQueueContainer<int> dataContainer = new QueueContainer<int>();
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before Test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            _timer.Start();
+            for (int i = 0; i < maxSize; i++)
+            {
+                try
+                {
+                    dataContainer.Queue.Enqueue(i);
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            _timer.Stop();
+            GC.Collect();
+
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "Queue add (best)",
+                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel> {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
+        [Route("api/queue/add/worst")]
+        [HttpGet]
+        public IHttpActionResult GetWorst(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IQueueContainer<int> dataContainer = new QueueContainer<int>();
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before Test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            for (int i = 0; i < 2; i++)
+            {
+                dataContainer.Queue.Enqueue(i);
+            }
+
+            _timer.Start();
+            for (int i = 2; i < maxSize; i++)
+            {
+                var tempList = dataContainer.Queue.ToList();
+                dataContainer.Queue.Clear();
+                tempList.Insert(1, i);
+                
+                foreach (var item in tempList)
+                {
+                    dataContainer.Queue.Enqueue(item);
+                }
+            }
+
+            _timer.Stop();
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "Queue add (worst)",
+                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel> {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
         }
     }
 }
