@@ -171,14 +171,8 @@ namespace WebAPI_ASP_Net.Controllers
             _timer.Start();
             for (int i = 2; i < maxSize; i++)
             {
-                var tempList = dataContainer.Queue.ToList();
-                dataContainer.Queue.Clear();
-                tempList.Insert(1, i);
-                
-                foreach (var item in tempList)
-                {
-                    dataContainer.Queue.Enqueue(item);
-                }
+                int queueSize = dataContainer.Queue.Count();
+                dataContainer.Insert(1, i);
             }
 
             _timer.Stop();

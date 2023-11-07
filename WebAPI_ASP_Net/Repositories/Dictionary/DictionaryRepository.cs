@@ -1,36 +1,25 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using WebAPI_ASP_Net.Repositories.Containers.Dictionary;
 
 namespace WebAPI_ASP_Net.Repositories
 {
-    public class DictionaryRepository : IDictionaryRepository<int, int>
+    public class DictionaryRepository<TKey, TVal> : IDictionaryRepository<TKey, TVal>, IDictionaryContainer<TKey, TVal>
     {
-        private readonly IDictionaryContainer<int, int> _dictionaryContainer;
+        private readonly IDictionaryContainer<TKey, TVal> _dictionaryContainer;
 
-        public Dictionary<int, int> Dictionary => _dictionaryContainer.Dictionary;
+        public Dictionary<TKey, TVal> Dictionary => _dictionaryContainer.Dictionary;
 
-        public DictionaryRepository(IDictionaryContainer<int, int> container)
+        Dictionary<TKey, TVal> IDictionaryContainer<TKey, TVal>.Dictionary => throw new System.NotImplementedException();
+
+        public DictionaryRepository(IDictionaryContainer<TKey, TVal> container)
         {
             _dictionaryContainer = container;
         }
-        public IEnumerable<KeyValuePair<int, int>> GetAll()
-        {
-            return _dictionaryContainer.Dictionary;
-        }
 
-        public void Add(KeyValuePair<int, int> item)
+        public bool Update(TKey key, TVal newItem)
         {
-            _dictionaryContainer.Dictionary.Add(item.Key, item.Value);
-        }
-
-        public bool Delete(KeyValuePair<int, int> item)
-        {
-            return _dictionaryContainer.Dictionary.Remove(item.Key);
-        }
-
-        public bool Update(int key, int newItem)
-        {
-            if (_dictionaryContainer.Dictionary.TryGetValue(key, out int value))
+            if (_dictionaryContainer.Dictionary.TryGetValue(key, out TVal value))
             {
                 _dictionaryContainer.Dictionary[key] = newItem;
                 return true;
@@ -38,6 +27,31 @@ namespace WebAPI_ASP_Net.Repositories
             return false;
         }
 
+        IEnumerable<KeyValuePair<TKey, TVal>> ICollectionRepository<KeyValuePair<TKey, TVal>>.GetAll()
+        {
+            return _dictionaryContainer.Dictionary;
+        }
+
+        public void Add(KeyValuePair<TKey, TVal> item)
+        {
+            _dictionaryContainer.Dictionary.Add(item.Key, item.Value);
+        }
+
+        public bool Delete(KeyValuePair<TKey, TVal> item)
+        {
+            return _dictionaryContainer.Dictionary.Remove(item.Key);
+        }
+
+        public bool Update(int index, KeyValuePair<TKey, TVal> newItem)
+        {
+            if (index >= 0 && index < _dictionaryContainer.Dictionary.Count)
+            { 
+                KeyValuePair<TKey, TVal> item = _dictionaryContainer.Dictionary.ElementAt(index);
+                _dictionaryContainer.Dictionary[item.Key] = newItem.Value;
+                return true;
+            }
+            return false;
+        }
         public bool DeleteAll()
         {
             try
@@ -49,16 +63,6 @@ namespace WebAPI_ASP_Net.Repositories
                 return false;
             }
             return true;
-        }
-
-        public bool Update(int key, KeyValuePair<int, int> newItem)
-        {
-            if (_dictionaryContainer.Dictionary.TryGetValue(key, out int value))
-            {
-                _dictionaryContainer.Dictionary[key] = newItem.Value;
-                return true;
-            }
-            return false;
         }
     }
 }

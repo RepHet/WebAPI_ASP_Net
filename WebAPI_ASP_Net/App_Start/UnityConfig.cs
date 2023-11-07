@@ -29,7 +29,7 @@ namespace WebAPI_ASP_Net
             container.RegisterType(typeof(IStackContainer<>), typeof(StackContainer<>), new ContainerControlledLifetimeManager());
 
             // Реєстрація репозиторіїв залежностей
-            container.RegisterType<IDictionaryRepository<int, int>, DictionaryRepository>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IDictionaryRepository<int, int>, DictionaryRepository<int, int>>(new ContainerControlledLifetimeManager());
             container.RegisterType<IQueueRepository<int>, QueueRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<IListRepository<int>, ListRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<IStackRepository<int>, StackRepository>(new ContainerControlledLifetimeManager());
