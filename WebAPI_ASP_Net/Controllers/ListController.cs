@@ -107,7 +107,7 @@ namespace WebAPI_ASP_Net.Controllers
 
             var executionTime = new ExecutionTimeMetricModel
             {
-                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
+                ExecutionTimeMs = _timer.ElapsedTime().TotalMilliseconds
             };
 
             var GCMemorySize = new MemoryInfoMetricModel
@@ -181,7 +181,7 @@ namespace WebAPI_ASP_Net.Controllers
 
             var executionTime = new ExecutionTimeMetricModel
             {
-                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
+                ExecutionTimeMs = _timer.ElapsedTime().TotalMilliseconds
             };
 
             var GCMemorySize = new MemoryInfoMetricModel

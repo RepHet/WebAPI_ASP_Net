@@ -85,7 +85,7 @@ namespace WebAPI_ASP_Net.Controllers
                 Type = EMemorySizeType.Byte.ToString(),
             };
 
-            long executionTimeMs = 0;
+            double executionTimeMs = 0.0;
 
             for (int i = 0; i < maxSize; i++)
             {
@@ -97,7 +97,7 @@ namespace WebAPI_ASP_Net.Controllers
 
                     dictionaryContainer.Dictionary.Clear();
 
-                    executionTimeMs += _timer.ElapsedTime().Milliseconds;
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
                     _timer.Reset();
                 }
                 catch
@@ -193,7 +193,7 @@ namespace WebAPI_ASP_Net.Controllers
 
             var executionTime = new ExecutionTimeMetricModel
             {
-                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
+                ExecutionTimeMs = _timer.ElapsedTime().TotalMilliseconds
             };
 
             var GCMemorySize = new MemoryInfoMetricModel

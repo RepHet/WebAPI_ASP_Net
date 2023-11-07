@@ -16,7 +16,7 @@ namespace WebAPI_ASP_Net.Controllers
 {
     public class QueueController : ApiController
     {
-        const int maxElementSize = 268435456 / 2;
+        const int maxElementSize = 100000 / 2;
         private readonly IQueueRepository<int> _queueRepository;
         private readonly ITimer _timer;
 
@@ -112,7 +112,7 @@ namespace WebAPI_ASP_Net.Controllers
 
             var executionTime = new ExecutionTimeMetricModel
             {
-                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
+                ExecutionTimeMs = _timer.ElapsedTime().TotalMilliseconds
             };
 
             var GCMemorySize = new MemoryInfoMetricModel
@@ -193,7 +193,7 @@ namespace WebAPI_ASP_Net.Controllers
 
             var executionTime = new ExecutionTimeMetricModel
             {
-                ExecutionTimeMs = _timer.ElapsedTime().Milliseconds
+                ExecutionTimeMs = _timer.ElapsedTime().TotalMilliseconds
             };
 
             var GCMemorySize = new MemoryInfoMetricModel

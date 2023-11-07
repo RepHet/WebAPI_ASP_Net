@@ -2,6 +2,6 @@
 {
     public class ExecutionTimeMetricModel : IMetricModel
     {
-        public long ExecutionTimeMs { get; set; }
+        public double ExecutionTimeMs { get; set; }
     }
 }
