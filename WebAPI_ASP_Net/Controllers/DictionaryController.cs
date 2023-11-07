@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Http;
 using WebAPI_ASP_Net.Repositories;
-using WebAPI_ASP_Net.Repositories.Containers.List;
+using WebAPI_ASP_Net.Repositories.Containers.Dictionary;
+using WebAPI_ASP_Net.Utils;
 using WebAPI_ASP_Net.Utils.MemoryUsage;
 using WebAPI_ASP_Net.Utils.MetricModels;
-using WebAPI_ASP_Net.Utils;
-using WebAPI_ASP_Net.Utils.Timer;
-using WebAPI_ASP_Net.Repositories.Containers.Dictionary;
-using System;
 using WebAPI_ASP_Net.Utils.Models.MetricModels;
+using WebAPI_ASP_Net.Utils.Timer;
 
 namespace WebAPI_ASP_Net.Controllers
 {

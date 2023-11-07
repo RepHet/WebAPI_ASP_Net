@@ -1,5 +1,4 @@
 ﻿using System.Web.Http;
-using WebAPI_ASP_Net.Repositories;
 using WebAPI_ASP_Net.Repositories.Queue;
 
 namespace WebAPI_ASP_Net.Controllers
