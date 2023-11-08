@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
+﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI_ASP_Net.Repositories.Containers.Queue;
 using WebAPI_ASP_Net.Repositories.Queue;
 using WebAPI_ASP_Net.Utils;
@@ -10,9 +7,11 @@ using WebAPI_ASP_Net.Utils.MetricModels;
 using WebAPI_ASP_Net.Utils.Models.MetricModels;
 using WebAPI_ASP_Net.Utils.Timer;
 
-namespace WebAPI_ASP_Net.Controllers
+namespace WebAPI_ASP_NET_Core.Controllers
 {
-    public class QueueController : ApiController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class QueueController : ControllerBase
     {
         const int maxElementSize = 100000 / 2;
         private readonly IQueueRepository<int> _queueRepository;
@@ -24,24 +23,22 @@ namespace WebAPI_ASP_Net.Controllers
             _timer = timer;
         }
 
-        [Route("api/queue")]
-        public IHttpActionResult GetAll()
+        [HttpGet]
+        public ActionResult GetAll()
         {
             var items = _queueRepository.GetAll();
             return Ok(items);
         }
 
-        [Route("api/queue")]
         [HttpPost]
-        public IHttpActionResult Add(int item)
+        public ActionResult Add(int item)
         {
             _queueRepository.Add(item);
             return Ok();
         }
 
-        [Route("api/queue")]
         [HttpPut]
-        public IHttpActionResult Update(int oldItem, int newItem)
+        public ActionResult Update(int oldItem, int newItem)
         {
             bool success = _queueRepository.Update(oldItem, newItem);
             if (success)
@@ -54,9 +51,8 @@ namespace WebAPI_ASP_Net.Controllers
             }
         }
 
-        [Route("api/queue")]
         [HttpDelete]
-        public IHttpActionResult Delete(int item)
+        public ActionResult Delete(int item)
         {
             bool success = _queueRepository.Delete(item);
             if (success)
@@ -71,7 +67,7 @@ namespace WebAPI_ASP_Net.Controllers
 
         [Route("api/queue/add/best")]
         [HttpGet]
-        public IHttpActionResult GetBest(int maxSize = maxElementSize)
+        public ActionResult<PerformanceTestModel> GetBest(int maxSize = maxElementSize)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -123,7 +119,7 @@ namespace WebAPI_ASP_Net.Controllers
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
                 TestName = "Queue add (best)",
-                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                Metrics = new Dictionary<string, IEnumerable<object>>
                 {
                     {
                         "Test execution time",
@@ -147,7 +143,7 @@ namespace WebAPI_ASP_Net.Controllers
         }
         [Route("api/queue/add/worst")]
         [HttpGet]
-        public IHttpActionResult GetWorst(int maxSize = maxElementSize)
+        public ActionResult<PerformanceTestModel> GetWorst(int maxSize = maxElementSize)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -198,7 +194,7 @@ namespace WebAPI_ASP_Net.Controllers
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
                 TestName = "Queue add (worst)",
-                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                Metrics = new Dictionary<string, IEnumerable<object>>
                 {
                     {
                         "Test execution time",

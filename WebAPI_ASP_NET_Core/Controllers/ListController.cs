@@ -1,49 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
-using WebAPI_ASP_Net.Repositories.Containers.Queue;
-using WebAPI_ASP_Net.Repositories.Queue;
+﻿using Microsoft.AspNetCore.Mvc;
+using WebAPI_ASP_Net.Repositories.Containers.List;
+using WebAPI_ASP_Net.Repositories.List;
 using WebAPI_ASP_Net.Utils;
 using WebAPI_ASP_Net.Utils.MemoryUsage;
 using WebAPI_ASP_Net.Utils.MetricModels;
 using WebAPI_ASP_Net.Utils.Models.MetricModels;
 using WebAPI_ASP_Net.Utils.Timer;
 
-namespace WebAPI_ASP_Net.Controllers
+namespace WebAPI_ASP_NET_Core.Controllers
 {
-    public class QueueController : ApiController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ListController : ControllerBase
     {
-        const int maxElementSize = 100000 / 2;
-        private readonly IQueueRepository<int> _queueRepository;
+        const int maxElementSize = 268435456 / 2;
+        private readonly IListRepository<int> _listRepository;
         private readonly ITimer _timer;
 
-        public QueueController(IQueueRepository<int> queueRepository, ITimer timer)
+        public ListController(IListRepository<int> listRepository, ITimer timer)
         {
-            _queueRepository = queueRepository;
+            _listRepository = listRepository;
             _timer = timer;
         }
 
-        [Route("api/queue")]
-        public IHttpActionResult GetAll()
+        [HttpGet]
+        public ActionResult GetAll()
         {
-            var items = _queueRepository.GetAll();
+            var items = _listRepository.GetAll();
             return Ok(items);
         }
 
-        [Route("api/queue")]
         [HttpPost]
-        public IHttpActionResult Add(int item)
+        public ActionResult Add(int item)
         {
-            _queueRepository.Add(item);
+            _listRepository.Add(item);
             return Ok();
         }
 
-        [Route("api/queue")]
         [HttpPut]
-        public IHttpActionResult Update(int oldItem, int newItem)
+        public ActionResult Update(int oldItem, int newItem)
         {
-            bool success = _queueRepository.Update(oldItem, newItem);
+            bool success = _listRepository.Update(oldItem, newItem);
             if (success)
             {
                 return Ok();
@@ -54,11 +51,10 @@ namespace WebAPI_ASP_Net.Controllers
             }
         }
 
-        [Route("api/queue")]
         [HttpDelete]
-        public IHttpActionResult Delete(int item)
+        public ActionResult Delete(int item)
         {
-            bool success = _queueRepository.Delete(item);
+            bool success = _listRepository.Delete(item);
             if (success)
             {
                 return Ok();
@@ -68,15 +64,14 @@ namespace WebAPI_ASP_Net.Controllers
                 return NotFound();
             }
         }
-
-        [Route("api/queue/add/best")]
+        [Route("api/list/add/best")]
         [HttpGet]
-        public IHttpActionResult GetBest(int maxSize = maxElementSize)
+        public ActionResult<PerformanceTestModel> GetBest(int maxSize = maxElementSize)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            IQueueContainer<int> dataContainer = new QueueContainer<int>();
+            IListContainer<int> listContainer = new ListContainer<int>();
 
             var processMemorySizeBeforeTest = new MemoryInfoMetricModel
             {
@@ -90,7 +85,7 @@ namespace WebAPI_ASP_Net.Controllers
             {
                 try
                 {
-                    dataContainer.Queue.Enqueue(i);
+                    listContainer.List.Add(i);
                 }
                 catch
                 {
@@ -122,8 +117,8 @@ namespace WebAPI_ASP_Net.Controllers
 
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
-                TestName = "Queue add (best)",
-                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                TestName = "List add (best)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
                 {
                     {
                         "Test execution time",
@@ -145,15 +140,14 @@ namespace WebAPI_ASP_Net.Controllers
 
             return Ok(performanceResult);
         }
-        [Route("api/queue/add/worst")]
+        [Route("api/list/add/worst")]
         [HttpGet]
-        public IHttpActionResult GetWorst(int maxSize = maxElementSize)
+        public ActionResult<PerformanceTestModel> GetWorst(int maxSize = maxElementSize)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            IQueueContainer<int> dataContainer = new QueueContainer<int>();
-
+            IListContainer<int> listContainer = new ListContainer<int>();
             var processMemorySizeBeforeTest = new MemoryInfoMetricModel
             {
                 Title = "Process before Test",
@@ -161,18 +155,19 @@ namespace WebAPI_ASP_Net.Controllers
                 Type = EMemorySizeType.Byte.ToString(),
             };
 
-            for (int i = 0; i < 2; i++)
-            {
-                dataContainer.Queue.Enqueue(i);
-            }
-
             _timer.Start();
-            for (int i = 2; i < maxSize; i++)
+            listContainer.List.Add(0);
+            for (int i = 1; i < maxSize; i++)
             {
-                int queueSize = dataContainer.Queue.Count();
-                dataContainer.Insert(1, i);
+                try
+                {
+                    listContainer.List.Insert(i - 1, i);
+                }
+                catch
+                {
+                    break;
+                }
             }
-
             _timer.Stop();
             GC.Collect();
 
@@ -197,8 +192,8 @@ namespace WebAPI_ASP_Net.Controllers
 
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
-                TestName = "Queue add (worst)",
-                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                TestName = "List add (worst)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
                 {
                     {
                         "Test execution time",

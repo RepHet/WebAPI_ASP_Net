@@ -1,49 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
-using WebAPI_ASP_Net.Repositories.Containers.Queue;
-using WebAPI_ASP_Net.Repositories.Queue;
+﻿using Microsoft.AspNetCore.Mvc;
+using WebAPI_ASP_Net.Repositories.Containers.Stack;
+using WebAPI_ASP_Net.Repositories.Stack;
 using WebAPI_ASP_Net.Utils;
 using WebAPI_ASP_Net.Utils.MemoryUsage;
 using WebAPI_ASP_Net.Utils.MetricModels;
 using WebAPI_ASP_Net.Utils.Models.MetricModels;
 using WebAPI_ASP_Net.Utils.Timer;
 
-namespace WebAPI_ASP_Net.Controllers
+namespace WebAPI_ASP_NET_Core.Controllers
 {
-    public class QueueController : ApiController
+
+    [ApiController]
+    [Route("api/[controller]")]
+    public class StackController : ControllerBase
     {
         const int maxElementSize = 100000 / 2;
-        private readonly IQueueRepository<int> _queueRepository;
+        private readonly IStackRepository<int> _stackRepository;
         private readonly ITimer _timer;
 
-        public QueueController(IQueueRepository<int> queueRepository, ITimer timer)
+        public StackController(IStackRepository<int> stackRepository, ITimer timer)
         {
-            _queueRepository = queueRepository;
+            _stackRepository = stackRepository;
             _timer = timer;
         }
 
-        [Route("api/queue")]
-        public IHttpActionResult GetAll()
+        [HttpGet]
+        public ActionResult GetAll()
         {
-            var items = _queueRepository.GetAll();
+            var items = _stackRepository.GetAll();
             return Ok(items);
         }
 
-        [Route("api/queue")]
         [HttpPost]
-        public IHttpActionResult Add(int item)
+        public ActionResult Add(int item)
         {
-            _queueRepository.Add(item);
+            _stackRepository.Add(item);
             return Ok();
         }
 
-        [Route("api/queue")]
         [HttpPut]
-        public IHttpActionResult Update(int oldItem, int newItem)
+        public ActionResult Update(int oldItem, int newItem)
         {
-            bool success = _queueRepository.Update(oldItem, newItem);
+            bool success = _stackRepository.Update(oldItem, newItem);
             if (success)
             {
                 return Ok();
@@ -54,11 +52,10 @@ namespace WebAPI_ASP_Net.Controllers
             }
         }
 
-        [Route("api/queue")]
         [HttpDelete]
-        public IHttpActionResult Delete(int item)
+        public ActionResult Delete(int item)
         {
-            bool success = _queueRepository.Delete(item);
+            bool success = _stackRepository.Delete(item);
             if (success)
             {
                 return Ok();
@@ -69,14 +66,14 @@ namespace WebAPI_ASP_Net.Controllers
             }
         }
 
-        [Route("api/queue/add/best")]
+        [Route("api/stack/add/best")]
         [HttpGet]
-        public IHttpActionResult GetBest(int maxSize = maxElementSize)
+        public ActionResult<PerformanceTestModel> GetBest(int maxSize = maxElementSize)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            IQueueContainer<int> dataContainer = new QueueContainer<int>();
+            IStackContainer<int> dataContainer = new StackContainer<int>();
 
             var processMemorySizeBeforeTest = new MemoryInfoMetricModel
             {
@@ -90,7 +87,7 @@ namespace WebAPI_ASP_Net.Controllers
             {
                 try
                 {
-                    dataContainer.Queue.Enqueue(i);
+                    dataContainer.Stack.Push(i);
                 }
                 catch
                 {
@@ -122,8 +119,8 @@ namespace WebAPI_ASP_Net.Controllers
 
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
-                TestName = "Queue add (best)",
-                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                TestName = "Stack add (best)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
                 {
                     {
                         "Test execution time",
@@ -145,14 +142,14 @@ namespace WebAPI_ASP_Net.Controllers
 
             return Ok(performanceResult);
         }
-        [Route("api/queue/add/worst")]
+        [Route("api/stack/add/worst")]
         [HttpGet]
-        public IHttpActionResult GetWorst(int maxSize = maxElementSize)
+        public ActionResult<PerformanceTestModel> GetWorst(int maxSize = maxElementSize)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            IQueueContainer<int> dataContainer = new QueueContainer<int>();
+            IStackContainer<int> dataContainer = new StackContainer<int>();
 
             var processMemorySizeBeforeTest = new MemoryInfoMetricModel
             {
@@ -163,14 +160,13 @@ namespace WebAPI_ASP_Net.Controllers
 
             for (int i = 0; i < 2; i++)
             {
-                dataContainer.Queue.Enqueue(i);
+                dataContainer.Stack.Push(i);
             }
 
             _timer.Start();
             for (int i = 2; i < maxSize; i++)
             {
-                int queueSize = dataContainer.Queue.Count();
-                dataContainer.Insert(1, i);
+                dataContainer.Insert(0, i);
             }
 
             _timer.Stop();
@@ -197,8 +193,8 @@ namespace WebAPI_ASP_Net.Controllers
 
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
-                TestName = "Queue add (worst)",
-                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                TestName = "Stack add (worst)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
                 {
                     {
                         "Test execution time",
