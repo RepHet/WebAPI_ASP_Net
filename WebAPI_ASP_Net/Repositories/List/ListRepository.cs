@@ -4,33 +4,33 @@ using WebAPI_ASP_Net.Repositories.List;
 
 namespace WebAPI_ASP_Net.Repositories
 {
-    public class ListRepository : IListRepository<int>, IListContainer<int>
+    public class ListRepository<T> : IListRepository<T>, IListContainer<T>
     {
-        private readonly IListContainer<int> _listContainer;
+        private readonly IListContainer<T> _listContainer;
 
-        public List<int> List => _listContainer.List;
+        public List<T> List => _listContainer.List;
 
-        public ListRepository(IListContainer<int> container)
+        public ListRepository(IListContainer<T> container)
         {
             _listContainer = container;
         }
 
-        public IEnumerable<int> GetAll()
+        public IEnumerable<T> GetAll()
         {
             return _listContainer.List;
         }
 
-        public void Add(int item)
+        public void Add(T item)
         {
             _listContainer.List.Add(item);
         }
 
-        public bool Delete(int item)
+        public bool Delete(T item)
         {
             return _listContainer.List.Remove(item);
         }
 
-        public bool Update(int index, int newItem)
+        public bool Update(int index, T newItem)
         {
             if (index > -1 && index < _listContainer.List.Count)
             {

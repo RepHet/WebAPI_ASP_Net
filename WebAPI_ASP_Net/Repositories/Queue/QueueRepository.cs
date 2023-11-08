@@ -5,26 +5,26 @@ using WebAPI_ASP_Net.Repositories.Queue;
 
 namespace WebAPI_ASP_Net.Repositories
 {
-    public class QueueRepository : IQueueRepository<int>
+    public class QueueRepository<T>: IQueueRepository<T>, IQueueContainer<T>
     {
-        private readonly IQueueContainer<int> _queueContainer;
-        public Queue<int> Queue => _queueContainer.Queue;
+        private readonly IQueueContainer<T> _queueContainer;
+        public Queue<T> Queue => _queueContainer.Queue;
 
-        public QueueRepository(IQueueContainer<int> container)
+        public QueueRepository(IQueueContainer<T> container)
         {
             _queueContainer = container;
         }
-        public IEnumerable<int> GetAll()
+        public IEnumerable<T> GetAll()
         {
             return _queueContainer.Queue;
         }
 
-        public void Add(int item)
+        public void Add(T item)
         {
             _queueContainer.Queue.Enqueue(item);
         }
 
-        public bool Delete(int item)
+        public bool Delete(T item)
         {
             var tempList = _queueContainer.Queue.ToList();
             bool success = tempList.Remove(item);
@@ -39,12 +39,12 @@ namespace WebAPI_ASP_Net.Repositories
             return success;
         }
 
-        public int Peek()
+        public T Peek()
         {
             return _queueContainer.Queue.Peek();
         }
 
-        public bool Update(int index, int newItem)
+        public bool Update(int index, T newItem)
         {
             var tempList = _queueContainer.Queue.ToList();
             if (index > -1 && index < tempList.Count)
@@ -71,6 +71,11 @@ namespace WebAPI_ASP_Net.Repositories
                 return false;
             }
             return true;
+        }
+
+        public bool Insert(int index, T newItem)
+        {
+            return _queueContainer.Insert(index, newItem);
         }
     }
 }

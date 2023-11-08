@@ -2,6 +2,6 @@
 {
     public interface IStackRepository<T> : ICollectionRepository<T>
     {
-        int Peek();
+        T Peek();
     }
 }

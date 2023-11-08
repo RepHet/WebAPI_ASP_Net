@@ -30,14 +30,9 @@ namespace WebAPI_ASP_Net
 
             // Реєстрація репозиторіїв залежностей
             container.RegisterType<IDictionaryRepository<int, int>, DictionaryRepository<int, int>>(new ContainerControlledLifetimeManager());
-            container.RegisterType<IQueueRepository<int>, QueueRepository>(new ContainerControlledLifetimeManager());
-            container.RegisterType<IListRepository<int>, ListRepository>(new ContainerControlledLifetimeManager());
-            container.RegisterType<IStackRepository<int>, StackRepository>(new ContainerControlledLifetimeManager());
-
-            //container.RegisterType(typeof(IDictionaryRepository<,>), typeof(DictionaryRepository), new ContainerControlledLifetimeManager());
-            //container.RegisterType(typeof(IQueueRepository<>), typeof(QueueRepository), new ContainerControlledLifetimeManager());
-            //container.RegisterType(typeof(IListRepository<>), typeof(ListRepository), new ContainerControlledLifetimeManager());
-            //container.RegisterType(typeof(IStackRepository<>), typeof(StackRepository), new ContainerControlledLifetimeManager());
+            container.RegisterType<IQueueRepository<int>, QueueRepository<int>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IListRepository<int>, ListRepository<int>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IStackRepository<int>, StackRepository<int>>(new ContainerControlledLifetimeManager());
 
             container.RegisterType<ITimer, PerformanceTimer>();
 
