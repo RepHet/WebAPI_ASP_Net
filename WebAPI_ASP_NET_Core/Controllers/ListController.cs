@@ -10,7 +10,6 @@ using WebAPI_ASP_Net.Utils.Timer;
 namespace WebAPI_ASP_NET_Core.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class ListController : ControllerBase
     {
         const int maxElementSize = 268435456 / 2;
@@ -23,21 +22,21 @@ namespace WebAPI_ASP_NET_Core.Controllers
             _timer = timer;
         }
 
-        [HttpGet]
+        [HttpGet("/api/list")]
         public ActionResult GetAll()
         {
             var items = _listRepository.GetAll();
             return Ok(items);
         }
 
-        [HttpPost]
+        [HttpPost("/api/list")]
         public ActionResult Add(int item)
         {
             _listRepository.Add(item);
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("/api/list")]
         public ActionResult Update(int oldItem, int newItem)
         {
             bool success = _listRepository.Update(oldItem, newItem);
@@ -51,7 +50,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("/api/list")]
         public ActionResult Delete(int item)
         {
             bool success = _listRepository.Delete(item);
@@ -64,8 +63,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
                 return NotFound();
             }
         }
-        [Route("api/list/add/best")]
-        [HttpGet]
+        [HttpGet("/api/list/add/best")]
         public ActionResult<PerformanceTestModel> GetBest(int maxSize = maxElementSize)
         {
             GC.Collect();
@@ -140,8 +138,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
 
             return Ok(performanceResult);
         }
-        [Route("api/list/add/worst")]
-        [HttpGet]
+        [HttpGet("/api/list/add/worst")]
         public ActionResult<PerformanceTestModel> GetWorst(int maxSize = maxElementSize)
         {
             GC.Collect();

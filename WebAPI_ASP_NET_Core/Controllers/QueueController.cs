@@ -10,7 +10,6 @@ using WebAPI_ASP_Net.Utils.Timer;
 namespace WebAPI_ASP_NET_Core.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class QueueController : ControllerBase
     {
         const int maxElementSize = 100000 / 2;
@@ -23,21 +22,21 @@ namespace WebAPI_ASP_NET_Core.Controllers
             _timer = timer;
         }
 
-        [HttpGet]
+        [HttpGet("/api/queue")]
         public ActionResult GetAll()
         {
             var items = _queueRepository.GetAll();
             return Ok(items);
         }
 
-        [HttpPost]
+        [HttpPost("/api/queue")]
         public ActionResult Add(int item)
         {
             _queueRepository.Add(item);
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("/api/queue")]
         public ActionResult Update(int oldItem, int newItem)
         {
             bool success = _queueRepository.Update(oldItem, newItem);
@@ -51,7 +50,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("/api/queue")]
         public ActionResult Delete(int item)
         {
             bool success = _queueRepository.Delete(item);
@@ -65,7 +64,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
             }
         }
 
-        [Route("api/queue/add/best")]
+        [Route("/api/queue/add/best")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> GetBest(int maxSize = maxElementSize)
         {
@@ -141,7 +140,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
 
             return Ok(performanceResult);
         }
-        [Route("api/queue/add/worst")]
+        [Route("/api/queue/add/worst")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> GetWorst(int maxSize = maxElementSize)
         {

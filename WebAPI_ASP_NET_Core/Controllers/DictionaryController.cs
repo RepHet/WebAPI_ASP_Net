@@ -10,7 +10,6 @@ using WebAPI_ASP_Net.Utils.Timer;
 namespace WebAPI_ASP_NET_Core.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class DictionaryController : ControllerBase
     {
         const int maxElementSize = 268435456 / 2;
@@ -25,21 +24,21 @@ namespace WebAPI_ASP_NET_Core.Controllers
             _timer = timer;
         }
 
-        [HttpGet]
+        [HttpGet("/api/dictionary")]
         public ActionResult GetAll()
         {
             var items = _dictionaryRepository.GetAll();
             return Ok(items);
         }
 
-        [HttpPost]
+        [HttpPost("/api/dictionary")]
         public ActionResult Add(KeyValuePair<int, int> item)
         {
             _dictionaryRepository.Add(item);
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("/api/dictionary")]
         public ActionResult Update(int key, int newItem)
         {
             bool success = _dictionaryRepository.Update(key, newItem);
@@ -53,7 +52,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("/api/dictionary")]
         public ActionResult Delete(KeyValuePair<int, int> item)
         {
             bool success = _dictionaryRepository.Delete(item);
@@ -66,7 +65,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
                 return NotFound();
             }
         }
-        [Route("api/dictionary/add/best")]
+        [Route("/api/dictionary/add/best")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> GetBest(int maxSize = maxElementSize)
         {
@@ -150,7 +149,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
             return Ok(performanceResult);
         }
 
-        [Route("api/dictionary/add/worst")]
+        [Route("/api/dictionary/add/worst")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> GetWorst(int maxSize = maxElementSize)
         {

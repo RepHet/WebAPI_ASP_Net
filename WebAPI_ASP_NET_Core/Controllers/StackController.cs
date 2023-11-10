@@ -11,7 +11,6 @@ namespace WebAPI_ASP_NET_Core.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
     public class StackController : ControllerBase
     {
         const int maxElementSize = 100000 / 2;
@@ -24,21 +23,21 @@ namespace WebAPI_ASP_NET_Core.Controllers
             _timer = timer;
         }
 
-        [HttpGet]
+        [HttpGet("/api/stack")]
         public ActionResult GetAll()
         {
             var items = _stackRepository.GetAll();
             return Ok(items);
         }
 
-        [HttpPost]
+        [HttpPost("/api/stack")]
         public ActionResult Add(int item)
         {
             _stackRepository.Add(item);
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("/api/stack")]
         public ActionResult Update(int oldItem, int newItem)
         {
             bool success = _stackRepository.Update(oldItem, newItem);
@@ -52,7 +51,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("/api/stack")]
         public ActionResult Delete(int item)
         {
             bool success = _stackRepository.Delete(item);
@@ -66,7 +65,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
             }
         }
 
-        [Route("api/stack/add/best")]
+        [Route("/api/stack/add/best")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> GetBest(int maxSize = maxElementSize)
         {
@@ -142,7 +141,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
 
             return Ok(performanceResult);
         }
-        [Route("api/stack/add/worst")]
+        [Route("/api/stack/add/worst")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> GetWorst(int maxSize = maxElementSize)
         {
