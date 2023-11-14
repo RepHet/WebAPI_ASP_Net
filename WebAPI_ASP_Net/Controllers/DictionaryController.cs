@@ -229,5 +229,190 @@ namespace WebAPI_ASP_Net.Controllers
 
             return Ok(performanceResult);
         }
+
+        //        Оновлення(Best Case) :
+        //Тут найкращий варіант - оновлення елемента вже існуючого ключа.
+        //Операція оновлення в Dictionary відбувається швидко,
+        //оскільки ми працюємо з існуючим ключем, 
+        //і нам не потрібно проводити додаткових операцій по пошуку ключа.
+
+        [Route("api/dictionary/update/best")]
+        [HttpGet]
+        public IHttpActionResult UpdateBest(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IDictionaryContainer<int, int> dictionaryContainer = new DictionaryContainer<int, int>();
+
+            for (int i = 0; i < maxSize; i++)
+            {
+                dictionaryContainer.Dictionary.Add(i, i);
+            }
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            double executionTimeMs = 0.0;
+
+            for (int i = 0; i < maxSize; i++)
+            {
+                try
+                {
+                    _timer.Start();
+                    dictionaryContainer.Dictionary[i] = i + 1;
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = executionTimeMs
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "Dictionary update (best)",
+                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel>
+                        {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
+
+        //        Видалення(Worst Case) :
+        //Найгірший варіант - видалення елементів у зворотньому порядку,
+        //оскільки це призведе до перебудови Dictionary при кожному видаленні.
+        //Видалення останнього елемента призведе до найбільшого впливу на продуктивність, 
+        //оскільки всі елементи мають змінити свої індекси.
+        [Route("api/dictionary/remove/worst")]
+        [HttpGet]
+        public IHttpActionResult RemoveWorst(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IDictionaryContainer<int, int> dictionaryContainer = new DictionaryContainer<int, int>();
+
+            for (int i = 0; i < maxSize; i++)
+            {
+                dictionaryContainer.Dictionary.Add(i, i);
+            }
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            double executionTimeMs = 0.0;
+
+            for (int i = maxSize - 1; i >= 0; i--)
+            {
+                try
+                {
+                    _timer.Start();
+                    dictionaryContainer.Dictionary.Remove(i);
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = executionTimeMs
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "Dictionary remove (worst)",
+                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel>
+                        {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
     }
 }
