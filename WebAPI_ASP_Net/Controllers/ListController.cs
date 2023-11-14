@@ -86,9 +86,10 @@ namespace WebAPI_ASP_Net.Controllers
             _timer.Start();
             for (int i = 0; i < maxSize; i++)
             {
-                try {
+                try
+                {
                     listContainer.List.Add(i);
-                } 
+                }
                 catch
                 {
                     break;
@@ -142,34 +143,50 @@ namespace WebAPI_ASP_Net.Controllers
 
             return Ok(performanceResult);
         }
-        [Route("api/list/add/worst")]
+        //        Оновлення(Best Case) :
+        //Тут найкращий варіант - оновлення елемента за його індексом,
+        // оскільки це виконується за константний час.
+        //Ми працюємо безпосередньо з індексами, тому немає потреби в пошуку.
+
+        [Route("api/list/update/best")]
         [HttpGet]
-        public IHttpActionResult GetWorst(int maxSize = maxElementSize)
+        public IHttpActionResult UpdateBest(int maxSize = maxElementSize)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
             IListContainer<int> listContainer = new ListContainer<int>();
+
+            for (int i = 0; i < maxSize; i++)
+            {
+                listContainer.List.Add(i);
+            }
+
             var processMemorySizeBeforeTest = new MemoryInfoMetricModel
             {
-                Title = "Process before Test",
+                Title = "Process before test",
                 Size = MemoryInfoProvider.GetProcessMemorySize(),
                 Type = EMemorySizeType.Byte.ToString(),
             };
 
-            _timer.Start();
-            listContainer.List.Add(0);
-            for (int i = 1; i < maxSize; i++)
+            double executionTimeMs = 0.0;
+
+            for (int i = 0; i < maxSize; i++)
             {
-                try {
-                    listContainer.List.Insert(i - 1, i);
-                } 
+                try
+                {
+                    _timer.Start();
+                    listContainer.List[i] = i + 1; // Оновлення елемента
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
                 catch
                 {
                     break;
                 }
             }
-            _timer.Stop();
             GC.Collect();
 
             var processMemorySizeAfterTest = new MemoryInfoMetricModel
@@ -181,7 +198,7 @@ namespace WebAPI_ASP_Net.Controllers
 
             var executionTime = new ExecutionTimeMetricModel
             {
-                ExecutionTimeMs = _timer.ElapsedTime().TotalMilliseconds
+                ExecutionTimeMs = executionTimeMs
             };
 
             var GCMemorySize = new MemoryInfoMetricModel
@@ -193,12 +210,13 @@ namespace WebAPI_ASP_Net.Controllers
 
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
-                TestName = "List add (worst)",
+                TestName = "List update (best)",
                 Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
                 {
                     {
                         "Test execution time",
-                        new List<IMetricModel> {
+                        new List<IMetricModel>
+                        {
                             executionTime
                         }
                     },
@@ -216,5 +234,98 @@ namespace WebAPI_ASP_Net.Controllers
 
             return Ok(performanceResult);
         }
+
+        //        Видалення(Worst Case) :
+        //Найгірший варіант - видалення елементів у зворотньому порядку, 
+        //оскільки це призведе до копіювання всіх наступних елементів у списку при кожному видаленні.
+        //Видалення останнього елемента призведе до найбільшого впливу на продуктивність, 
+        //оскільки всі елементи мають змінити свої індекси.
+        [Route("api/list/remove/worst")]
+        [HttpGet]
+        public IHttpActionResult RemoveWorst(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IListContainer<int> listContainer = new ListContainer<int>();
+
+            for (int i = 0; i < maxSize; i++)
+            {
+                listContainer.List.Add(i);
+            }
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            double executionTimeMs = 0.0;
+
+            for (int i = maxSize - 1; i >= 0; i--)
+            {
+                try
+                {
+                    _timer.Start();
+                    listContainer.List.RemoveAt(i); // Видалення елемента
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = executionTimeMs
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "List remove (worst)",
+                Metrics = new Dictionary<string, IEnumerable<IMetricModel>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel>
+                        {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
+
     }
 }

@@ -212,5 +212,188 @@ namespace WebAPI_ASP_NET_Core.Controllers
 
             return Ok(performanceResult);
         }
+        //        Оновлення(Best Case) :
+        //Тут найкращий варіант - оновлення елемента за його індексом,
+        // оскільки це виконується за константний час.
+        //Ми працюємо безпосередньо з індексами, тому немає потреби в пошуку.
+
+        [Route("api/list/update/best")]
+        [HttpGet]
+        public ActionResult<PerformanceTestModel> UpdateBest(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IListContainer<int> listContainer = new ListContainer<int>();
+
+            for (int i = 0; i < maxSize; i++)
+            {
+                listContainer.List.Add(i);
+            }
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            double executionTimeMs = 0.0;
+
+            for (int i = 0; i < maxSize; i++)
+            {
+                try
+                {
+                    _timer.Start();
+                    listContainer.List[i] = i + 1; // Оновлення елемента
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = executionTimeMs
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "List update (best)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel>
+                        {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
+
+        //        Видалення(Worst Case) :
+        //Найгірший варіант - видалення елементів у зворотньому порядку, 
+        //оскільки це призведе до копіювання всіх наступних елементів у списку при кожному видаленні.
+        //Видалення останнього елемента призведе до найбільшого впливу на продуктивність, 
+        //оскільки всі елементи мають змінити свої індекси.
+        [Route("api/list/remove/worst")]
+        [HttpGet]
+        public ActionResult<PerformanceTestModel> RemoveWorst(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IListContainer<int> listContainer = new ListContainer<int>();
+
+            for (int i = 0; i < maxSize; i++)
+            {
+                listContainer.List.Add(i);
+            }
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            double executionTimeMs = 0.0;
+
+            for (int i = maxSize - 1; i >= 0; i--)
+            {
+                try
+                {
+                    _timer.Start();
+                    listContainer.List.RemoveAt(i); // Видалення елемента
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = executionTimeMs
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "List remove (worst)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel>
+                        {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
     }
 }
