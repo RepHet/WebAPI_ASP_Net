@@ -7,5 +7,6 @@ namespace WebAPI_ASP_Net.Repositories.Containers.Queue
         Queue<T> Queue { get; }
 
         bool Insert(int index, T newItem);
+        bool Update(int index, T newItem);
     }
 }

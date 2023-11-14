@@ -44,5 +44,21 @@ namespace WebAPI_ASP_Net.Repositories.Containers.Queue
             return false;
         }
 
+        public bool Update(int index, T newItem)
+        {
+            var tempList = Queue.ToList();
+            if (index > -1 && index < tempList.Count)
+            {
+                tempList[index] = newItem;
+                Queue.Clear();
+                foreach (var i in tempList)
+                {
+                    Queue.Enqueue(i);
+                }
+                return true;
+            }
+            return false;
+        }
+
     }
 }
