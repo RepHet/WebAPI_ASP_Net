@@ -143,10 +143,6 @@ namespace WebAPI_ASP_Net.Controllers
 
             return Ok(performanceResult);
         }
-        //        Оновлення(Best Case) :
-        //Тут найкращий варіант - оновлення елемента за його індексом,
-        // оскільки це виконується за константний час.
-        //Ми працюємо безпосередньо з індексами, тому немає потреби в пошуку.
 
         [Route("api/list/update/best")]
         [HttpGet]
@@ -176,7 +172,7 @@ namespace WebAPI_ASP_Net.Controllers
                 try
                 {
                     _timer.Start();
-                    listContainer.List[i] = i + 1; // Оновлення елемента
+                    listContainer.List[0] = i + 1; // Оновлення елемента
                     _timer.Stop();
 
                     executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
@@ -235,11 +231,6 @@ namespace WebAPI_ASP_Net.Controllers
             return Ok(performanceResult);
         }
 
-        //        Видалення(Worst Case) :
-        //Найгірший варіант - видалення елементів у зворотньому порядку, 
-        //оскільки це призведе до копіювання всіх наступних елементів у списку при кожному видаленні.
-        //Видалення останнього елемента призведе до найбільшого впливу на продуктивність, 
-        //оскільки всі елементи мають змінити свої індекси.
         [Route("api/list/remove/worst")]
         [HttpGet]
         public IHttpActionResult RemoveWorst(int maxSize = maxElementSize)

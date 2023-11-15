@@ -215,10 +215,6 @@ namespace WebAPI_ASP_NET_Core.Controllers
 
             return Ok(performanceResult);
         }
-        //        Оновлення(Best Case) :
-        //Тут найкращий варіант - оновлення елемента за його індексом, 
-        //оскільки це виконується за константний час.
-        //Ми використовуємо власний метод Update, який перебудовує чергу.
 
         [Route("api/queue/update/best")]
         [HttpGet]
@@ -306,14 +302,10 @@ namespace WebAPI_ASP_NET_Core.Controllers
 
             return Ok(performanceResult);
         }
-        //        Видалення(Worst Case) :
-        //Найгірший варіант - видалення елементів з початку черги.
-        //Оскільки при видаленні елемента з початку всі інші елементи повинні зміститися вліво,
-        //то час видалення буде лінійним і залежатиме від кількості елементів у черзі.
 
-        [Route("api/queue/remove/worst")]
+        [Route("api/queue/remove/best")]
         [HttpGet]
-        public ActionResult<PerformanceTestModel> RemoveWorst(int maxSize = maxElementSize)
+        public ActionResult<PerformanceTestModel> RemoveBest(int maxSize = maxElementSize)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -373,7 +365,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
 
             PerformanceTestModel performanceResult = new PerformanceTestModel
             {
-                TestName = "Queue remove (worst)",
+                TestName = "Queue remove (Best)",
                 Metrics = new Dictionary<string, IEnumerable<object>>
                 {
                     {

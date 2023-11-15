@@ -226,12 +226,6 @@ namespace WebAPI_ASP_NET_Core.Controllers
             return Ok(performanceResult);
         }
 
-        //        Оновлення(Best Case) :
-        //Тут найкращий варіант - оновлення елемента вже існуючого ключа.
-        //Операція оновлення в Dictionary відбувається швидко,
-        //оскільки ми працюємо з існуючим ключем, 
-        //і нам не потрібно проводити додаткових операцій по пошуку ключа.
-
         [Route("api/dictionary/update/best")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> UpdateBest(int maxSize = maxElementSize)
@@ -319,11 +313,6 @@ namespace WebAPI_ASP_NET_Core.Controllers
             return Ok(performanceResult);
         }
 
-        //        Видалення(Worst Case) :
-        //Найгірший варіант - видалення елементів у зворотньому порядку,
-        //оскільки це призведе до перебудови Dictionary при кожному видаленні.
-        //Видалення останнього елемента призведе до найбільшого впливу на продуктивність, 
-        //оскільки всі елементи мають змінити свої індекси.
         [Route("api/dictionary/remove/worst")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> RemoveWorst(int maxSize = maxElementSize)

@@ -212,11 +212,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
 
             return Ok(performanceResult);
         }
-        //        Оновлення(Best Case) :
-        //Тут найкращий варіант - оновлення елемента за його індексом,
-        // оскільки це виконується за константний час.
-        //Ми працюємо безпосередньо з індексами, тому немає потреби в пошуку.
-
+        
         [Route("api/list/update/best")]
         [HttpGet]
         public ActionResult<PerformanceTestModel> UpdateBest(int maxSize = maxElementSize)
@@ -245,7 +241,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
                 try
                 {
                     _timer.Start();
-                    listContainer.List[i] = i + 1; // Оновлення елемента
+                    listContainer.List[0] = i + 1; // Оновлення елемента
                     _timer.Stop();
 
                     executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
