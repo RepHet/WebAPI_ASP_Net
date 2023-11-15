@@ -38,9 +38,9 @@ namespace WebAPI_ASP_NET_Core.Controllers
         }
 
         [HttpPut("/api/stack")]
-        public ActionResult Update(int oldItem, int newItem)
+        public ActionResult Update(int index, int newItem)
         {
-            bool success = _stackRepository.Update(oldItem, newItem);
+            bool success = _stackRepository.Update(index, newItem);
             if (success)
             {
                 return Ok();
@@ -198,6 +198,273 @@ namespace WebAPI_ASP_NET_Core.Controllers
                     {
                         "Test execution time",
                         new List<IMetricModel> {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
+
+        [Route("api/stack/update/best")]
+        [HttpGet]
+        public ActionResult<PerformanceTestModel> UpdateBest(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IStackContainer<int> dataContainer = new StackContainer<int>();
+
+            // Додайте елементи до стеку
+            for (int i = 0; i < maxSize; i++)
+            {
+                dataContainer.Stack.Push(i);
+            }
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            double executionTimeMs = 0.0;
+
+            // Оновіть елементи
+            for (int i = 0; i < maxSize; i++)
+            {
+                try
+                {
+                    _timer.Start();
+                    dataContainer.Update(maxSize - 1, i + 1); // Оновлення елемента
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = executionTimeMs
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "Stack update (best)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel>
+                        {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
+
+        [Route("api/stack/update/worst")]
+        [HttpGet]
+        public ActionResult<PerformanceTestModel> UpdateWorst(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IStackContainer<int> dataContainer = new StackContainer<int>();
+
+            // Додайте елементи до стеку
+            for (int i = 0; i < maxSize; i++)
+            {
+                dataContainer.Stack.Push(i);
+            }
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            double executionTimeMs = 0.0;
+
+            // Оновіть елементи
+            for (int i = 0; i < maxSize; i++)
+            {
+                try
+                {
+                    _timer.Start();
+                    dataContainer.Update(0, i + 1); // Оновлення елемента
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = executionTimeMs
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "Stack update (worst)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel>
+                        {
+                            executionTime
+                        }
+                    },
+                    {
+                        "Memory",
+                        new List<IMetricModel>
+                        {
+                            GCMemorySize,
+                            processMemorySizeBeforeTest,
+                            processMemorySizeAfterTest
+                        }
+                    }
+                }
+            };
+
+            return Ok(performanceResult);
+        }
+
+        [Route("api/stack/remove/best")]
+        [HttpGet]
+        public ActionResult<PerformanceTestModel> RemoveBest(int maxSize = maxElementSize)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            IStackContainer<int> dataContainer = new StackContainer<int>();
+
+            var processMemorySizeBeforeTest = new MemoryInfoMetricModel
+            {
+                Title = "Process before test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            // Додайте елементи до стеку
+            for (int i = 0; i < maxSize; i++)
+            {
+                dataContainer.Stack.Push(i);
+            }
+
+            double executionTimeMs = 0.0;
+
+            // Видаліть елементи
+            for (int i = 0; i < maxSize; i++)
+            {
+                try
+                {
+                    _timer.Start();
+                    dataContainer.Stack.Pop(); // Видалення елемента
+                    _timer.Stop();
+
+                    executionTimeMs += _timer.ElapsedTime().TotalMilliseconds;
+                    _timer.Reset();
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            GC.Collect();
+
+            var processMemorySizeAfterTest = new MemoryInfoMetricModel
+            {
+                Title = "Process after test",
+                Size = MemoryInfoProvider.GetProcessMemorySize(),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            var executionTime = new ExecutionTimeMetricModel
+            {
+                ExecutionTimeMs = executionTimeMs
+            };
+
+            var GCMemorySize = new MemoryInfoMetricModel
+            {
+                Title = "GC",
+                Size = MemoryInfoProvider.GetGCHeapSize(true),
+                Type = EMemorySizeType.Byte.ToString(),
+            };
+
+            PerformanceTestModel performanceResult = new PerformanceTestModel
+            {
+                TestName = "Stack remove (best)",
+                Metrics = new Dictionary<string, IEnumerable<object>>
+                {
+                    {
+                        "Test execution time",
+                        new List<IMetricModel>
+                        {
                             executionTime
                         }
                     },

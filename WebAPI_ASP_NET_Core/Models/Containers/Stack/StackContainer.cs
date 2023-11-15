@@ -44,5 +44,20 @@ namespace WebAPI_ASP_Net.Repositories.Containers.Stack
             return false;
         }
 
+        bool IStackContainer<T>.Update(int index, T newItem)
+        {
+            var tempList = Stack.ToList();
+            if (index >= 0 && index < Stack.Count)
+            {
+                tempList[index] = newItem;
+                Stack.Clear();
+                foreach (var i in tempList)
+                {
+                    Stack.Push(i);
+                }
+                return true;
+            }
+            return false;
+        }
     }
 }

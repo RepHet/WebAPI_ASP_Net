@@ -7,5 +7,6 @@ namespace WebAPI_ASP_Net.Repositories.Containers.Stack
         Stack<T> Stack { get; }
 
         bool Insert(int index, T newItem);
+        bool Update(int index, T newItem);
     }
 }
