@@ -40,9 +40,9 @@ namespace WebAPI_ASP_Net.Controllers
 
         [Route("api/list")]
         [HttpPut]
-        public IHttpActionResult Update(int oldItem, int newItem)
+        public IHttpActionResult Update(int index, int newItem)
         {
-            bool success = _listRepository.Update(oldItem, newItem);
+            bool success = _listRepository.Update(index, newItem);
             if (success)
             {
                 return Ok();

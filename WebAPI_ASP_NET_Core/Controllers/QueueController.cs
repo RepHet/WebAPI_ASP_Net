@@ -37,9 +37,9 @@ namespace WebAPI_ASP_NET_Core.Controllers
         }
 
         [HttpPut("/api/queue")]
-        public ActionResult Update(int oldItem, int newItem)
+        public ActionResult Update(int index, int newItem)
         {
-            bool success = _queueRepository.Update(oldItem, newItem);
+            bool success = _queueRepository.Update(index, newItem);
             if (success)
             {
                 return Ok();
