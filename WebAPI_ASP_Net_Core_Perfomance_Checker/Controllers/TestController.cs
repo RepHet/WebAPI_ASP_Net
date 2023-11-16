@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Diagnostics;
+using System.Text;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -25,7 +27,67 @@ public class TestController : ControllerBase
         return testResults.ToList();
     }
 
-    // Метод для виклику API та отримання даних
+    [HttpGet("api-tester-timing")]
+    public async Task<ActionResult<TestExecutionTime>> GetTestsTiming([FromQuery] string request, [FromQuery] int numberOfRequests)
+    {
+
+        var stopwatch = Stopwatch.StartNew();
+
+        using (var httpClient = new HttpClient())
+        {
+            for (int i = 0; i < numberOfRequests; i++)
+            {
+                HttpResponseMessage response = await httpClient.GetAsync(request);
+            }
+        }
+
+        stopwatch.Stop();
+
+        // Повернення загального часу виконання всіх запитів
+        var responseModel = new TestExecutionTime
+        {
+            ExecutionTimeMs = stopwatch.Elapsed.TotalMilliseconds
+        };
+
+        return responseModel;
+    }
+
+    [HttpGet("api-tester-timing-async")]
+    public async Task<ActionResult<TestExecutionTime>> GetTestsTimingASync([FromQuery] string request, [FromQuery] int numberOfRequests)
+    {
+        Stopwatch stopwatch = new Stopwatch();
+
+        using (HttpClient client = new HttpClient())
+        {
+            Console.WriteLine($"Вимірюємо час для {numberOfRequests} асинхронних запитів...");
+
+            stopwatch.Start();
+
+            // Створюємо масив завдань (tasks)
+            Task<HttpResponseMessage>[] tasks = new Task<HttpResponseMessage>[numberOfRequests];
+
+            // Запускаємо асинхронні запити
+            for (int i = 0; i < numberOfRequests; i++)
+            {
+                tasks[i] = client.GetAsync(request);
+            }
+
+            // Очікуємо завершення всіх асинхронних запитів
+            await Task.WhenAll(tasks);
+
+            stopwatch.Stop();
+        }
+
+        // Повернення загального часу виконання всіх запитів
+        var responseModel = new TestExecutionTime
+        {
+            ExecutionTimeMs = stopwatch.Elapsed.TotalMilliseconds
+        };
+
+        return responseModel;
+    }
+
+    // Метод для виклику API та отримання даних з тестами
     private async Task<TestData> CallApiAndExtractTestData(string apiUrl)
     {
         string apiResponse = await CallApi(apiUrl);
@@ -36,7 +98,7 @@ public class TestController : ControllerBase
 
     // Метод для виклику API
     private async Task<string> CallApi(string apiUrl)
-    {
+        {
         using (HttpClient client = new HttpClient())
         {
             HttpResponseMessage response = await client.GetAsync(apiUrl);
@@ -49,6 +111,7 @@ public class TestController : ControllerBase
             return null;
         }
     }
+
 
     // Метод для обробки отриманих даних та витягнення тестів
     private TestData ExtractTestDataFromApiResponse(string apiResponse)
@@ -78,7 +141,13 @@ public class TestController : ControllerBase
 
     public class TestExecutionTime
     {
-        public double ExecutionTimeMs { get; set; }
+        private double _executionTimeMs;
+
+        public double ExecutionTimeMs
+        {
+            get => _executionTimeMs;
+            set => _executionTimeMs = Math.Round(value, 6);
+        }
     }
 
     public class Memory

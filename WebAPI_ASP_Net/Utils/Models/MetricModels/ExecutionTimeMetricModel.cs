@@ -1,7 +1,15 @@
-﻿namespace WebAPI_ASP_Net.Utils.MetricModels
+﻿using System;
+
+namespace WebAPI_ASP_Net.Utils.MetricModels
 {
     public class ExecutionTimeMetricModel : IMetricModel
     {
-        public double ExecutionTimeMs { get; set; }
+        private double _executionTimeMs;
+
+        public double ExecutionTimeMs
+        {
+            get => _executionTimeMs;
+            set => _executionTimeMs = Math.Round(value, 6);
+        }
     }
 }

@@ -34,6 +34,13 @@ builder.Services.AddScoped<ITimer, PerformanceTimer>();
 
 var app = builder.Build();
 
+app.UseCors(builder =>
+      builder
+          .AllowAnyHeader()
+          .AllowAnyMethod()
+          .AllowCredentials()
+   );
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

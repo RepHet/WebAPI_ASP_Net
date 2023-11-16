@@ -35,7 +35,7 @@ namespace WebAPI_ASP_Net.Controllers
         public IHttpActionResult Add(int item)
         {
             _listRepository.Add(item);
-            return Ok();
+            return Ok(item);
         }
 
         [Route("api/list")]

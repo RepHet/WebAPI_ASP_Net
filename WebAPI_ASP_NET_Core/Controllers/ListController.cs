@@ -33,7 +33,7 @@ namespace WebAPI_ASP_NET_Core.Controllers
         public ActionResult Add(int item)
         {
             _listRepository.Add(item);
-            return Ok();
+            return Ok(item);
         }
 
         [HttpPut("/api/list")]
